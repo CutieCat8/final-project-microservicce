@@ -65,3 +65,5 @@ Invoke-RestMethod -Method Post -Uri 'http://localhost:3000/api/auth/login' -Cont
 
 - ขั้น 1: build ผ่าน; health/port tests 3 รายการผ่าน; commit `a5cd736` push `gun` สำเร็จ
 - ขั้น 2: เพิ่ม Register/Login, validation, hash และ duplicate protection; build ผ่าน; tests รวม 8 รายการผ่านก่อน commit
+- ขั้น 2 commit `9c5a90f` push `gun` สำเร็จ
+- ขั้น 3: Unit 17 และ Integration 34 รายการ รวม 51 tests ผ่าน; ใช้ Gateway จริงของ PM; รายละเอียดใน [TEST_SPEC.md](TEST_SPEC.md)
