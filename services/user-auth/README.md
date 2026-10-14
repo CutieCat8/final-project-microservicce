@@ -28,6 +28,29 @@ npm start
 
 ใช้ข้อมูลในหน่วยความจำสำหรับเดโม ข้อมูลหายเมื่อ restart และแต่ละ instance มีข้อมูลของตัวเอง ไม่สร้าง token เพราะ contract อนุญาตให้ละได้; การ login ยืนยันข้อมูลบัญชีเท่านั้น ยังไม่ป้องกัน Course/Enrollment API
 
+### Validation และความปลอดภัยของข้อมูล
+
+- `name`: string หลัง trim ยาว 1–100 ตัวอักษร
+- `email`: string รูปแบบอีเมล ยาวไม่เกิน 254 ตัวอักษร; trim และแปลงเป็นตัวพิมพ์เล็กก่อนค้นหา/บันทึก
+- `password` สมัครบัญชี: string ไม่ใช่ช่องว่างล้วน ยาว 8–128 ตัวอักษร; ตอน login รับรหัสผ่านไม่ว่างถึง 128 ตัวอักษร แล้วตรวจว่าตรงหรือไม่
+- ไม่ trim หรือแปลงตัวพิมพ์รหัสผ่าน; ช่องว่างที่ตั้งไว้เป็นส่วนของรหัสผ่าน
+- เก็บเฉพาะ `passwordHash` จาก scrypt พร้อม salt สุ่ม 16 bytes และเปรียบเทียบด้วย `timingSafeEqual`; ไม่คืน password/hash/salt ใน HTTP response
+- แต่ละบัญชีได้ `studentId` รูปแบบ `S` ตามด้วย UUID; ส่ง string นี้ให้ Enrollment ใช้ตาม contract ห้ามสมมติว่าเป็นเลขลำดับ `S001`
+- คำขอใช้ `Content-Type: application/json`; ชนิดอื่นคืน `415`, JSON เสียคืน `400`, body เกิน 16 KB คืน `413`
+
+ไม่มีบัญชีสำเร็จรูปใน source code ต้อง Register ก่อน Login ใช้เฉพาะอีเมล `.test` และข้อมูลสมมติในเดโม
+
+### ตัวอย่างทดสอบด้วย PowerShell
+
+```powershell
+$account = @{ name = 'Demo Student'; email = 'ada@example.test'; password = 'demo-password' }
+Invoke-RestMethod -Method Post -Uri 'http://localhost:3000/api/auth/register' -ContentType 'application/json' -Body ($account | ConvertTo-Json)
+$login = @{ email = 'ada@example.test'; password = 'demo-password' }
+Invoke-RestMethod -Method Post -Uri 'http://localhost:3000/api/auth/login' -ContentType 'application/json' -Body ($login | ConvertTo-Json)
+```
+
+ค่าข้างต้นเป็นข้อมูลทดสอบสาธารณะ ไม่ใช่รหัสผ่านบัญชีจริง
+
 ## ลำดับงาน
 
 1. โครง TypeScript/Express และ health check
@@ -37,3 +60,8 @@ npm start
 5. คู่มือมือใหม่ ผลตรวจ และรายละเอียดส่งต่อทีม
 
 ทำทีละขั้น ตรวจแล้ว commit/push branch `gun` ตามคำขอ Gun
+
+## บันทึกผลทีละขั้น
+
+- ขั้น 1: build ผ่าน; health/port tests 3 รายการผ่าน; commit `a5cd736` push `gun` สำเร็จ
+- ขั้น 2: เพิ่ม Register/Login, validation, hash และ duplicate protection; build ผ่าน; tests รวม 8 รายการผ่านก่อน commit
