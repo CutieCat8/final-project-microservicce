@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบลงทะเบียนเรียนรายวิชา</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; background: #f4f7fb; color: #172033; }
+    body { margin: 0; }
+    header { padding: 2rem max(1rem, calc((100% - 960px) / 2)); background: #153b67; color: white; }
+    main { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem 2rem; display: grid; gap: 1rem; }
+    section { padding: 1.25rem; background: white; border: 1px solid #dbe3ee; border-radius: 12px; }
+    h1, h2 { margin-top: 0; }
+    form { display: flex; flex-wrap: wrap; gap: .65rem; }
+    input, button { font: inherit; padding: .65rem .8rem; border: 1px solid #bbc8d8; border-radius: 8px; }
+    input { flex: 1 1 180px; }
+    button { cursor: pointer; background: #1c5a99; color: white; border-color: #1c5a99; }
+    button.secondary { background: white; color: #1c5a99; }
+    li { margin: .5rem 0; }
+    output, pre { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #message { min-height: 1.5rem; color: #153b67; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ระบบลงทะเบียนเรียนรายวิชา</h1>
+    <p>ตัวอย่างหน้าเว็บสำหรับ Gateway ของโครงงานไมโครเซอร์วิส</p>
+  </header>
+  <main>
+    <section>
+      <h2>บัญชีผู้ใช้</h2>
+      <form id="register-form">
+        <input name="name" placeholder="ชื่อ" required>
+        <input name="email" type="email" placeholder="อีเมล" required>
+        <input name="password" type="password" placeholder="รหัสผ่าน" required>
+        <button>สมัครบัญชี</button>
+      </form>
+      <form id="login-form" style="margin-top:.75rem">
+        <input name="email" type="email" placeholder="อีเมล" required>
+        <input name="password" type="password" placeholder="รหัสผ่าน" required>
+        <button class="secondary">เข้าสู่ระบบ</button>
+      </form>
+    </section>
+    <section>
+      <h2>รายวิชา</h2>
+      <button id="load-courses" class="secondary">โหลดรายวิชา</button>
+      <ul id="courses"></ul>
+    </section>
+    <section>
+      <h2>ลงทะเบียนเรียน</h2>
+      <form id="enroll-form">
+        <input name="studentId" placeholder="รหัสนักศึกษา" required>
+        <input name="courseId" placeholder="รหัสวิชา" required>
+        <button>ลงทะเบียน</button>
+      </form>
+    </section>
+    <section>
+      <h2>ผลการทำงาน</h2>
+      <output id="message" role="status" aria-live="polite"></output>
+      <pre id="result"></pre>
+    </section>
+  </main>
+  <script>
+    const message = document.querySelector('#message');
+    const result = document.querySelector('#result');
+    async function callApi(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: { 'content-type': 'application/json', ...(options.headers || {}) }
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error?.message || `คำขอไม่สำเร็จ (${response.status})`);
+      return payload;
+    }
+    function show(label, payload) {
+      message.textContent = label;
+      result.textContent = JSON.stringify(payload, null, 2);
+    }
+    function formData(form) { return Object.fromEntries(new FormData(form).entries()); }
+    document.querySelector('#register-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      try { show('สมัครบัญชีสำเร็จ', await callApi('/api/auth/register', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) })); }
+      } catch (error) { message.textContent = error.message; }
+    });
+    document.querySelector('#login-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      try { show('เข้าสู่ระบบสำเร็จ', await callApi('/api/auth/login', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) })); }
+      } catch (error) { message.textContent = error.message; }
+    });
+    document.querySelector('#load-courses').addEventListener('click', async () => {
+      try {
+        const payload = await callApi('/api/courses');
+        const courses = Array.isArray(payload) ? payload : (payload.courses || []);
+        const list = document.querySelector('#courses');
+        list.replaceChildren(...courses.map(course => {
+          const item = document.createElement('li');
+          item.textContent = `${course.courseId || course.id || ''} — ${course.name || course.title || 'รายวิชา'}`;
+          return item;
+        }));
+        show(`โหลดรายวิชา ${courses.length} รายการ`, payload);
+      } catch (error) { message.textContent = error.message; }
+    });
+    document.querySelector('#enroll-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      try {
+        const payload = await callApi('/api/enrollments', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) });
+        show('ส่งคำขอลงทะเบียนแล้ว', payload);
+        const enrollmentId = payload.enrollment?.enrollmentId || payload.enrollmentId;
+        if (enrollmentId) {
+          const notification = await callApi(`/api/notifications/${encodeURIComponent(enrollmentId)}`);
+          show('ลงทะเบียนสำเร็จและได้รับข้อความยืนยัน', { enrollment: payload, notification });
+        }
+      } catch (error) { message.textContent = error.message; }
+    });
+  </script>
+</body>
+</html>

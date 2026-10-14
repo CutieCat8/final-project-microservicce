@@ -15,7 +15,7 @@
 ความสำคัญ: **P0** จำเป็นต่อการส่งงานและเดโม; **P1** ทำต่อหลัง P0 หรือเมื่อมีเวลา
 
 - [ ] **P0:** ยืนยันขอบเขตโครงงาน, API Path, รูปแบบ JSON และการยืนยันตัวตนร่วมกับสมาชิกทั้ง 4 คน
-- [ ] **P0:** วางแผนการ Deploy และ GitHub Actions ให้ครบทั้ง 5 service ใน monorepo พร้อมจัดทำ Test Specification 5 ชุดและวาง CI สำหรับ 5 service ใน repo เดียว
+- [ ] **P0:** จัดทำ API Contract และ Test Specification ให้ครบ 5 service; ประสาน Sea (CI) และ Safe (release workflow) พร้อมดูแล Docker Compose
 - [ ] **P0:** ทำหน้า Login และหน้าแสดงรายวิชา โดยให้เบราว์เซอร์ส่งคำขอผ่าน Gateway
 - [ ] **P0:** ทำหน้าลงทะเบียนและแสดงข้อความตอบกลับจาก Enrollment / Notification
 - [ ] **P0:** ทำ API Gateway เพื่อส่งคำขอไปยัง User/Auth, Course, Enrollment และบริการที่เกี่ยวข้อง
@@ -64,7 +64,3 @@ Windsurf ดูแล docker-compose.yml และ deploy/docker-compose.release
 - ตั้ง Docker Hub namespace และ GitHub Actions Secrets ของ repo กลุ่มครั้งเดียว แล้วตรวจว่า Actions เผยแพร่ image ได้
 - รวมงานผ่าน Pull Request หลัง CI ผ่าน และเผยแพร่ tag เมื่อบริการครบและพร้อมเดโม
 - งาน service ของ Windsurf อยู่ใน services/gateway-web/; งาน PM ส่วนกลางทำเฉพาะไฟล์ร่วมที่ระบุข้างต้น
-
-
-
-
