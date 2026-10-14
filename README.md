@@ -14,6 +14,13 @@ Browser → API Gateway / Web → User/Auth Service
 
 > Docker Hub ใช้เก็บและแจกจ่าย Docker image ส่วน Docker Compose ใช้สร้างเครือข่ายและเปิด containers ให้บริการเรียกหากันผ่านชื่อ service
 
+## ผู้รับผิดชอบไฟล์ส่วนกลาง
+
+- **Windsurf (PM):** API Gateway/Web, `docker-compose.yml`, `deploy/docker-compose.release.yml`, API contract และประสาน integration
+- **Sea (Developer):** CI workflow ของบริการทั้ง 5 ใน `.github/workflows/ci-*.yml`
+- **Safe (Developer):** `release-images.yml` สำหรับเผยแพร่ Docker Images ไป Docker Hub; Sea ช่วย review workflow
+- **เจ้าของแต่ละบริการ:** source code, tests, `Dockerfile` และ `.dockerignore` ของบริการตน พร้อมส่งคำสั่ง build/test, พอร์ต และ health endpoint ให้ผู้ดูแล workflow
+
 ## สมาชิกและบริการ
 
 | สมาชิก | ตำแหน่ง | โฟลเดอร์บริการที่เสนอ |
@@ -24,32 +31,33 @@ Browser → API Gateway / Web → User/Auth Service
 | Yuri | Tester | `services/enrollment/` |
 | Safe | Developer | `services/notification/` |
 
-## โครงสร้าง repo ที่แนะนำ
+## โครงสร้าง repo
 
 ```text
 final-project-microservicce/
 ├── README.md
-├── docker-compose.yml
-├── .env.example
 ├── .gitignore
+├── .env.example
+├── docker-compose.yml
 ├── services/
-│   ├── gateway-web/
-│   ├── user-auth/
-│   ├── course/
-│   ├── enrollment/
-│   └── notification/
+│   ├── gateway-web/       (Windsurf: windsurf_work.md, src/)
+│   ├── user-auth/         (Gun: gun_work.md, src/)
+│   ├── course/            (Sea: sea_work.md, src/)
+│   ├── enrollment/        (Yuri: yuri_work.md, src/)
+│   └── notification/      (Safe: safe_work.md, src/)
 ├── .github/workflows/
 │   ├── ci-gateway-web.yml
 │   ├── ci-user-auth.yml
 │   ├── ci-course.yml
 │   ├── ci-enrollment.yml
+│   ├── ci-notification.yml
 │   └── release-images.yml
-├── docs/
-└── deploy/
-    └── docker-compose.release.yml
+├── docs/README.md
+├── deploy/docker-compose.release.yml
+└── work/ (สรุปและ work file ของกลุ่ม)
 ```
 
-ภายในแต่ละ `services/<ชื่อบริการ>/` ให้มีโปรเจกต์ของบริการนั้น เช่น `package.json`, source code, tests และ `Dockerfile` ของตนเอง ทุกบริการควรมี `GET /health` เพื่อให้ตรวจสถานะได้ง่าย โฟลเดอร์ `qa-automation/` เพิ่มภายหลังได้หากต้องการแยกชุดทดสอบรวม โดยไม่นับเป็นไมโครเซอร์วิสของสมาชิก
+ในแต่ละโฟลเดอร์บริการมี work file ของเจ้าของและโฟลเดอร์ `src/` เป็นจุดเริ่มต้น เจ้าของสร้าง `package.json`, `tests/`, `Dockerfile` และ `.dockerignore` เพิ่มตาม work file และทำ `GET /health`; ไฟล์ work file ช่วยให้ GitHub เก็บโฟลเดอร์ไว้ได้ ไม่ต้องใช้ `.gitkeep`
 
 ## เริ่มต้นทำงานใน repo
 
@@ -105,7 +113,7 @@ docker compose down
 3. ใน GitHub repo ไปที่ **Settings → Secrets and variables → Actions** แล้วเพิ่ม Secrets:
    - `DOCKERHUB_USERNAME` — Docker Hub namespace/username ที่ใช้เผยแพร่
    - `DOCKERHUB_TOKEN` — access token จาก Docker Hub
-4. เพิ่ม workflow ใน `.github/workflows/` ให้ทดสอบและ build บริการเมื่อมี Pull Request/Push และให้ release workflow push image ทั้ง 5 เมื่อสร้าง GitHub Release เช่น `v0.1.0`
+4. Sea ดูแล CI workflow ของทั้ง 5 บริการใน `.github/workflows/ci-*.yml`; Safe ดูแล `release-images.yml` สำหรับ build และ push image เมื่อสร้าง GitHub Release เช่น `v0.1.0` โดยเจ้าของบริการส่งคำสั่ง build/test, พอร์ต และ health check ให้ทั้งคู่
 5. ตรวจแท็บ **Actions** ว่า workflow สำเร็จ แล้วตรวจ image และ tag ใน Docker Hub
 
 Secrets เป็นการตั้งค่าร่วมของ repo โดยผู้มีสิทธิ์จัดการเท่านั้น สมาชิกแต่ละคนไม่ต้องสร้าง token ของตนหรือใส่ token ในไฟล์งาน หากสมาชิกจำเป็นต้อง push image ด้วยตนเอง ให้ใช้ token ที่ได้รับมอบหมายและเก็บไว้ใน Docker credential store; ห้าม commit token
@@ -123,10 +131,12 @@ docker pull <dockerhub-namespace>/registration-course:v0.1.0
 
 ### ลำดับ CI/CD ที่แนะนำ
 
+เมื่อ merge การเปลี่ยนแปลงเข้า `main` ระบบจะทดสอบและเผยแพร่ image ของบริการที่เปลี่ยนแปลงไปยัง Docker Hub โดยอัตโนมัติ ส่วนการ push tag รูปแบบ `v*` จะทดสอบและเผยแพร่ image ทั้ง 5 บริการ
+
 1. สมาชิก push branch และเปิด Pull Request
 2. GitHub Actions ของบริการที่เปลี่ยนแปลงติดตั้ง dependencies, build, รัน unit/integration tests และตรวจว่า Docker image build ได้
-3. รวม Pull Request หลัง CI ผ่าน
-4. PM สร้าง GitHub Release ที่มี tag เช่น `v0.1.0`
+3. รวม Pull Request หลัง CI ผ่าน โดย Sea ดูแล CI workflow และ Safe ช่วยตรวจ release workflow
+4. Windsurf ในฐานะ PM สร้าง GitHub Release ที่มี tag เช่น `v0.1.0`; Safe ดูแล workflow เผยแพร่ image และ Sea ช่วยตรวจ CI
 5. Release workflow build และ push image ทั้ง 5 ไป Docker Hub ด้วย version tag
 6. ดึง image ที่เผยแพร่แล้วมาทดลองเปิดด้วย Compose และตรวจ health endpoints ก่อนนำเสนอ
 
@@ -145,9 +155,9 @@ API เบื้องต้นที่เสนอ:
 
 ## ไฟล์วางแผนของกลุ่ม
 
-- [`PROJECT_SUMMARY.md`](PROJECT_SUMMARY.md) — สรุปแนวคิดและขอบเขตโครงงาน
-- [`member-work-file.md`](member-work-file.md) — แผนงานหลักและกติกาการทำงานร่วมกัน
-- `windsurf_work.md`, `gun_work.md`, `sea_work.md`, `yuri_work.md`, `safe_work.md` — รายการงานแยกตามสมาชิก
+- [`PROJECT_SUMMARY.md`](work/PROJECT_SUMMARY.md) — สรุปแนวคิดและขอบเขตโครงงาน
+- [`member-work-file.md`](work/member-work-file.md) — แผนงานหลักและกติกาการทำงานร่วมกัน
+- `services/<service>/<member>_work.md` — รายการงานและขั้นตอน setup เฉพาะของสมาชิกในโฟลเดอร์บริการที่รับผิดชอบ
 
 ## ตัวอย่างที่ใช้อ้างอิง
 
@@ -158,4 +168,10 @@ API เบื้องต้นที่เสนอ:
 - [Docker Compose: `up`](https://docs.docker.com/reference/cli/docker/compose/up/)
 - [Docker Hub access tokens](https://docs.docker.com/security/access-tokens/)
 - [GitHub Actions secrets](https://docs.github.com/en/actions/reference/security/secrets)
+
+
+
+
+
+
 

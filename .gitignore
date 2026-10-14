@@ -1,0 +1,47 @@
+# ซ่อนไฟล์ทั้งหมดไว้ก่อน แล้วเปิดเฉพาะไฟล์และโฟลเดอร์ของโครงงาน
+*
+
+# เปิดการมองเห็นโฟลเดอร์ เพื่อให้ Git เข้าถึงไฟล์ที่อนุญาตด้านล่างได้
+!*/
+
+# ไฟล์หลักและเอกสารของโครงงาน
+!/README.md
+!/.gitignore
+!/.env.example
+!/docker-compose.yml
+!PROJECT_SUMMARY.md
+# โค้ดและการตั้งค่าระบบ
+!/.github/
+!/.github/**
+!/services
+!/services/**
+!/docs/
+!/docs/**
+!/deploy/
+!/deploy/**
+
+# ไม่อัปโหลดข้อมูลลับหรือค่าตั้งค่าเฉพาะเครื่อง
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/id_rsa
+**/id_ed25519
+**/credentials.json
+**/service-account*.json
+
+# ไม่อัปโหลด dependencies, ผล build, cache และไฟล์ชั่วคราว
+**/node_modules/
+**/dist/
+**/coverage/
+**/.cache/
+**/tmp/
+**/temp/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/pnpm-debug.log*
+**/.DS_Store
+**/Thumbs.db

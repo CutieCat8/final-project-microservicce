@@ -1,0 +1,46 @@
+services:
+  user-auth:
+    image: ${DOCKERHUB_USERNAME:?ตั้งค่า DOCKERHUB_USERNAME ก่อน}/registration-auth:${IMAGE_TAG:-latest}
+    environment:
+      PORT: 3000
+      SERVICE_NAME: user-auth
+    restart: unless-stopped
+
+  course:
+    image: ${DOCKERHUB_USERNAME:?ตั้งค่า DOCKERHUB_USERNAME ก่อน}/registration-course:${IMAGE_TAG:-latest}
+    environment:
+      PORT: 3000
+      SERVICE_NAME: course
+    restart: unless-stopped
+
+  enrollment:
+    image: ${DOCKERHUB_USERNAME:?ตั้งค่า DOCKERHUB_USERNAME ก่อน}/registration-enrollment:${IMAGE_TAG:-latest}
+    environment:
+      PORT: 3000
+      SERVICE_NAME: enrollment
+    restart: unless-stopped
+
+  notification:
+    image: ${DOCKERHUB_USERNAME:?ตั้งค่า DOCKERHUB_USERNAME ก่อน}/registration-notification:${IMAGE_TAG:-latest}
+    environment:
+      PORT: 3000
+      SERVICE_NAME: notification
+    restart: unless-stopped
+
+  gateway-web:
+    image: ${DOCKERHUB_USERNAME:?ตั้งค่า DOCKERHUB_USERNAME ก่อน}/registration-gateway:${IMAGE_TAG:-latest}
+    environment:
+      PORT: 3000
+      AUTH_SERVICE_URL: http://user-auth:3000
+      COURSE_SERVICE_URL: http://course:3000
+      ENROLLMENT_SERVICE_URL: http://enrollment:3000
+      NOTIFICATION_SERVICE_URL: http://notification:3000
+    ports:
+      - "8080:3000"
+    depends_on:
+      - user-auth
+      - course
+      - enrollment
+      - notification
+    restart: unless-stopped
+

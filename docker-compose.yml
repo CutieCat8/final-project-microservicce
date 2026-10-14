@@ -1,0 +1,80 @@
+services:
+  user-auth:
+    build: ./services/user-auth
+    image: registration-auth:dev
+    environment:
+      PORT: 3000
+      SERVICE_NAME: user-auth
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  course:
+    build: ./services/course
+    image: registration-course:dev
+    environment:
+      PORT: 3000
+      SERVICE_NAME: course
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  enrollment:
+    build: ./services/enrollment
+    image: registration-enrollment:dev
+    environment:
+      PORT: 3000
+      SERVICE_NAME: enrollment
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  notification:
+    build: ./services/notification
+    image: registration-notification:dev
+    environment:
+      PORT: 3000
+      SERVICE_NAME: notification
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  gateway-web:
+    build: ./services/gateway-web
+    image: registration-gateway:dev
+    environment:
+      PORT: 3000
+      AUTH_SERVICE_URL: http://user-auth:3000
+      COURSE_SERVICE_URL: http://course:3000
+      ENROLLMENT_SERVICE_URL: http://enrollment:3000
+      NOTIFICATION_SERVICE_URL: http://notification:3000
+    ports:
+      - "8080:3000"
+    depends_on:
+      user-auth:
+        condition: service_healthy
+      course:
+        condition: service_healthy
+      enrollment:
+        condition: service_healthy
+      notification:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
