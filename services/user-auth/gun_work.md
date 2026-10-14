@@ -14,14 +14,14 @@
 
 ความสำคัญ: **P0** จำเป็นต่อการส่งงานและเดโม; **P1** ทำต่อหลัง P0 หรือเมื่อมีเวลา
 
-- [ ] **P0:** ยืนยันข้อมูลผู้ใช้และรูปแบบคำตอบของ Register / Login กับ Windsurf — โค้ดตรง docs/api-contract.md และ Gateway tests ผ่านแล้ว แต่ยังรอยืนยันจาก PM จริง
-- [x] **P0:** ทำ Endpoint สมัครบัญชีและเข้าสู่ระบบสำหรับเดโม พร้อมตรวจข้อมูลที่จำเป็น
-- [x] **P0:** หากบันทึกรหัสผ่าน ให้เก็บเฉพาะค่าแฮช ห้ามเก็บรหัสผ่านแบบข้อความธรรมดา
-- [x] **P0:** จัดทำกรณีทดสอบ Login สำเร็จ รหัสผ่านไม่ถูกต้อง และข้อมูลคำขอไม่ครบ
-- [x] **P0:** เขียน Unit Test อย่างน้อย 1 รายการ
-- [ ] **P0:** ทำ Integration Test สำหรับ Auth API ร่วมกับ Windsurf และตรวจผลใน GitHub Actions — tests ใช้ source Gateway จริงและผ่านในเครื่อง; CI run ของ PR #2 ยังไม่เริ่มเพราะบัญชีเจ้าของ repo ติด billing
-- [x] **P0:** ทำ Dockerfile และ build/test scripts ของ Auth พร้อมรายละเอียดใน README สำหรับ Sea ตั้ง CI และ Safe ตั้ง release (ยังไม่ได้ส่งข้อความถึงสมาชิก)
-- [x] **P1:** ตรวจการเชื่อมต่อ Gateway กับ Auth Service และรายงานผล CI — Gateway integration 7 tests ผ่าน; CI ถูก billing block ก่อนรัน tests รายงานใน VERIFICATION.md
+- [ ] **P0:** ยืนยันข้อมูลผู้ใช้และรูปแบบคำตอบของ Register / Login กับ Windsurf
+- [ ] **P0:** ทำ Endpoint สมัครบัญชีและเข้าสู่ระบบสำหรับเดโม พร้อมตรวจข้อมูลที่จำเป็น
+- [ ] **P0:** หากบันทึกรหัสผ่าน ให้เก็บเฉพาะค่าแฮช ห้ามเก็บรหัสผ่านแบบข้อความธรรมดา
+- [ ] **P0:** จัดทำกรณีทดสอบ Login สำเร็จ รหัสผ่านไม่ถูกต้อง และข้อมูลคำขอไม่ครบ
+- [ ] **P0:** เขียน Unit Test อย่างน้อย 1 รายการ
+- [ ] **P0:** ทำ Integration Test สำหรับ Auth API ร่วมกับ Windsurf และตรวจผลใน GitHub Actions
+- [ ] **P0:** ทำ Dockerfile และ build/test scripts ของ Auth แล้วส่งรายละเอียดให้ Sea ตั้ง CI และ Safe ตั้ง release
+- [ ] **P1:** ตรวจการเชื่อมต่อ Gateway กับ Auth Service และรายงานผล CI
 
 ## สิ่งที่ต้องประสาน
 
@@ -33,17 +33,6 @@
 ## ส่งต่องาน
 
 เมื่อ Auth API พร้อม ให้แจ้ง Endpoint และตัวอย่าง Request/Response ที่ใช้ทดสอบ พร้อมระบุผล Unit Test และ Integration Test
-
-### ผลงานและเอกสารที่พร้อมแล้ว
-
-- Unit 17 และ Integration 34 รวม 51 tests ผ่าน; Node runtime smoke 6 กรณีผ่าน
-- โค้ด Register/Login, validation, scrypt hash และ health endpoint พร้อม
-- Dockerfile/.dockerignore และ npm build/test/smoke scripts พร้อม; Docker image build/runtime ยังตรวจไม่ได้เพราะ local engine crash และ CI billing block
-- README.md: คำสั่งเปิดบริการและ API; TEST_SPEC.md: กรณีทดสอบ; BEGINNER_GUIDE.md: คำอธิบายทุกส่วนสำหรับมือใหม่
-- HANDOFF.md: รายละเอียดที่ Windsurf/Sea/Yuri/Safe ต้องใช้; เอกสารพร้อมส่ง แต่ไม่ได้ส่งข้อความถึงสมาชิกแทน Gun
-- VERIFICATION.md: commit/ผลตรวจจริงและงานที่ยังต้องอาศัยทีม
-- Draft PR #2: https://github.com/WindsurfHUB/final-project-microservicce/pull/2 เปิดเพื่อให้ CI ทำงานและทีมตรวจ ไม่มีการ merge main
-- ไฟล์หลัก work/member-work-file.md ที่อ้างถึงไม่มีจริงใน repo จึงไม่สามารถอัปเดตรายการ Gun ในไฟล์นั้น
 
 ## ตั้งค่าโปรเจกต์และส่งงาน
 
