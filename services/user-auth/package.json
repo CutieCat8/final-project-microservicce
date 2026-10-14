@@ -10,7 +10,9 @@
     "dev": "tsx watch src/index.ts",
     "test": "npm run build && node --test tests/*.test.cjs",
     "test:unit": "npm run build && node --test tests/*.unit.test.cjs",
-    "test:integration": "npm run build && node --test tests/*.integration.test.cjs"
+    "test:integration": "npm run build && node --test tests/*.integration.test.cjs",
+    "test:smoke": "node scripts/smoke.cjs",
+    "test:docker": "node scripts/docker-smoke.cjs"
   },
   "dependencies": { "express": "^5.1.0" },
   "devDependencies": {

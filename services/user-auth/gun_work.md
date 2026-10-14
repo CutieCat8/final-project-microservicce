@@ -20,7 +20,7 @@
 - [x] **P0:** จัดทำกรณีทดสอบ Login สำเร็จ รหัสผ่านไม่ถูกต้อง และข้อมูลคำขอไม่ครบ
 - [x] **P0:** เขียน Unit Test อย่างน้อย 1 รายการ
 - [ ] **P0:** ทำ Integration Test สำหรับ Auth API ร่วมกับ Windsurf และตรวจผลใน GitHub Actions
-- [ ] **P0:** ทำ Dockerfile และ build/test scripts ของ Auth แล้วส่งรายละเอียดให้ Sea ตั้ง CI และ Safe ตั้ง release
+- [x] **P0:** ทำ Dockerfile และ build/test scripts ของ Auth พร้อมรายละเอียดใน README สำหรับ Sea ตั้ง CI และ Safe ตั้ง release (ยังไม่ได้ส่งข้อความถึงสมาชิก)
 - [ ] **P1:** ตรวจการเชื่อมต่อ Gateway กับ Auth Service และรายงานผล CI
 
 ## สิ่งที่ต้องประสาน

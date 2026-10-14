@@ -61,9 +61,35 @@ Invoke-RestMethod -Method Post -Uri 'http://localhost:3000/api/auth/login' -Cont
 
 ทำทีละขั้น ตรวจแล้ว commit/push branch `gun` ตามคำขอ Gun
 
+## Docker และคำสั่งส่งต่อ Sea / Safe / Windsurf
+
+ชื่อ image `registration-auth`; build context `services/user-auth`; container port `3000`; health `GET /health`; ไม่ต้องตั้ง database หรือ secret สำหรับเดโมนี้
+
+```powershell
+# รันใน services/user-auth
+docker build -t registration-auth:dev .
+docker run --rm --name registration-auth-demo -p 127.0.0.1:3001:3000 registration-auth:dev
+```
+
+เปิด terminal อีกหน้าต่างในโฟลเดอร์เดียวกัน แล้วทดสอบ container:
+
+```powershell
+npm run test:smoke -- http://127.0.0.1:3001
+```
+
+หรือใช้ `npm run test:docker` เพื่อ build, เปิด container ชั่วคราวบนพอร์ตสุ่ม, รอ healthy, ทดสอบ 6 กรณี และลบเฉพาะ container ที่ script สร้างเอง ส่วน image `registration-auth:dev` ยังอยู่ให้ใช้ต่อ คำสั่งนี้ต้องมี Docker engine ที่พร้อม ไม่รวมอยู่ใน `npm test` เพื่อให้ Unit/API tests รันแยกจาก Docker ได้
+
+Dockerfile แบ่ง build/runtime: ขั้นแรกติดตั้ง dependencies และ compile TypeScript; ขั้น runtime มีเฉพาะ dependencies ที่จำเป็นและ dist, รันด้วยผู้ใช้ `node`, มี health check ใน image ทั้งทดสอบในเครื่องและ CI ใช้ Node major 24 เหมือนกัน
+
+เปิดเฉพาะ Auth ผ่าน Compose จาก root ได้ด้วย `docker compose up --build -d user-auth` แต่ Compose กลางไม่เปิดพอร์ต Auth ออก host ต้องใช้ Gateway หรือ `docker compose exec user-auth node -e "fetch('http://127.0.0.1:3000/health').then(r=>r.json()).then(console.log)"`
+
+CI กลางรันบน PR ไป main และ push main เท่านั้น จึงต้องเปิด PR หลัง push gun เพื่อให้ทดสอบจริง การ publish Docker Hub ยังเป็นงานของ Safe/ผู้ดูแล secrets ตามแผนทีม
+
 ## บันทึกผลทีละขั้น
 
 - ขั้น 1: build ผ่าน; health/port tests 3 รายการผ่าน; commit `a5cd736` push `gun` สำเร็จ
 - ขั้น 2: เพิ่ม Register/Login, validation, hash และ duplicate protection; build ผ่าน; tests รวม 8 รายการผ่านก่อน commit
 - ขั้น 2 commit `9c5a90f` push `gun` สำเร็จ
 - ขั้น 3: Unit 17 และ Integration 34 รายการ รวม 51 tests ผ่าน; ใช้ Gateway จริงของ PM; รายละเอียดใน [TEST_SPEC.md](TEST_SPEC.md)
+- ขั้น 3 commit `520b665` push `gun` สำเร็จ
+- ขั้น 4: เพิ่ม Dockerfile, .dockerignore, smoke และ Docker smoke scripts; clean install/tests ผ่าน; smoke บน Node ผ่าน; Docker ในเครื่องยังติด engine ไม่พร้อม รอ CI ตรวจ image build
