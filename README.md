@@ -52,7 +52,11 @@ final-project-microservicce/
 │   ├── ci-enrollment.yml
 │   ├── ci-notification.yml
 │   └── release-images.yml
-├── docs/README.md
+├── docs/
+│   ├── README.md
+│   ├── api-contract.md
+│   ├── test-specifications.md
+│   └── deployment.md
 ├── deploy/docker-compose.release.yml
 └── work/ (สรุปและ work file ของกลุ่ม)
 ```
@@ -110,13 +114,15 @@ docker compose down
 
 1. สร้างหรือเลือก Docker Hub namespace ของกลุ่ม และกำหนดชื่อ image ทั้ง 5 ให้สมาชิกทราบ
 2. สร้าง Docker Hub access token ที่มีสิทธิ์เขียน image สำหรับ automation อย่าใช้หรือส่งรหัสผ่านบัญชีให้สมาชิก
-3. ใน GitHub repo ไปที่ **Settings → Secrets and variables → Actions** แล้วเพิ่ม Secrets:
+3. Windsurf หรือ repo admin ไปที่ GitHub repo → **Settings → Secrets and variables → Actions** แล้วเพิ่ม Secrets:
    - `DOCKERHUB_USERNAME` — Docker Hub namespace/username ที่ใช้เผยแพร่
    - `DOCKERHUB_TOKEN` — access token จาก Docker Hub
-4. Sea ดูแล CI workflow ของทั้ง 5 บริการใน `.github/workflows/ci-*.yml`; Safe ดูแล `release-images.yml` สำหรับ build และ push image เมื่อสร้าง GitHub Release เช่น `v0.1.0` โดยเจ้าของบริการส่งคำสั่ง build/test, พอร์ต และ health check ให้ทั้งคู่
+4. Sea ดูแล CI workflow ของทั้ง 5 บริการใน `.github/workflows/ci-*.yml`; Safe ดูแล `release-images.yml` สำหรับ build และ push image เมื่อ push tag เช่น `v0.1.0` โดยเจ้าของบริการส่งคำสั่ง build/test, พอร์ต และ health check ให้ทั้งคู่
 5. ตรวจแท็บ **Actions** ว่า workflow สำเร็จ แล้วตรวจ image และ tag ใน Docker Hub
 
 Secrets เป็นการตั้งค่าร่วมของ repo โดยผู้มีสิทธิ์จัดการเท่านั้น สมาชิกแต่ละคนไม่ต้องสร้าง token ของตนหรือใส่ token ในไฟล์งาน หากสมาชิกจำเป็นต้อง push image ด้วยตนเอง ให้ใช้ token ที่ได้รับมอบหมายและเก็บไว้ใน Docker credential store; ห้าม commit token
+
+สำหรับขั้นตอนตั้งแต่ build/push จนเปิดระบบจาก image ดู [คู่มือ Deploy และ Docker Hub](docs/deployment.md)
 
 ### ทดลอง build และ push ด้วยตนเอง (ถ้าได้รับสิทธิ์)
 
@@ -157,6 +163,7 @@ API เบื้องต้นที่เสนอ:
 
 - [`PROJECT_SUMMARY.md`](work/PROJECT_SUMMARY.md) — สรุปแนวคิดและขอบเขตโครงงาน
 - [`member-work-file.md`](work/member-work-file.md) — แผนงานหลักและกติกาการทำงานร่วมกัน
+- [API Contract](docs/api-contract.md), [Test Specifications](docs/test-specifications.md), [Docker Hub/Deploy](docs/deployment.md) — เอกสารระบบและขั้นตอนที่กลุ่มใช้อ้างอิง
 - `services/<service>/<member>_work.md` — รายการงานและขั้นตอน setup เฉพาะของสมาชิกในโฟลเดอร์บริการที่รับผิดชอบ
 
 ## ตัวอย่างที่ใช้อ้างอิง
@@ -168,10 +175,3 @@ API เบื้องต้นที่เสนอ:
 - [Docker Compose: `up`](https://docs.docker.com/reference/cli/docker/compose/up/)
 - [Docker Hub access tokens](https://docs.docker.com/security/access-tokens/)
 - [GitHub Actions secrets](https://docs.github.com/en/actions/reference/security/secrets)
-
-
-
-
-
-
-
