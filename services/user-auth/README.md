@@ -93,3 +93,5 @@ CI กลางรันบน PR ไป main และ push main เท่า�
 - ขั้น 3: Unit 17 และ Integration 34 รายการ รวม 51 tests ผ่าน; ใช้ Gateway จริงของ PM; รายละเอียดใน [TEST_SPEC.md](TEST_SPEC.md)
 - ขั้น 3 commit `520b665` push `gun` สำเร็จ
 - ขั้น 4: เพิ่ม Dockerfile, .dockerignore, smoke และ Docker smoke scripts; clean install/tests ผ่าน; smoke บน Node ผ่าน; Docker ในเครื่องยังติด engine ไม่พร้อม รอ CI ตรวจ image build
+- ขั้น 4 commit `3bd6a29` push `gun` สำเร็จ; เปิด [Draft PR #2](https://github.com/WindsurfHUB/final-project-microservicce/pull/2) แล้ว แต่ CI ไม่เริ่มเพราะบัญชีเจ้าของ repo ติด billing
+- ขั้น 5: คู่มือ [BEGINNER_GUIDE.md](BEGINNER_GUIDE.md), ข้อมูลส่งต่อ [HANDOFF.md](HANDOFF.md) และหลักฐาน/ข้อจำกัด [VERIFICATION.md](VERIFICATION.md) พร้อมตรวจ
