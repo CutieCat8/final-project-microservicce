@@ -77,4 +77,4 @@ Windsurf ดูแล docker-compose.yml และ deploy/docker-compose.release
 - HTTP tests 5 กรณีติด listen EPERM และ Docker ติดสิทธิ์ socket ของ sandbox ต้องตรวจต่อใน Terminal/CI ที่เข้าถึงได้
 - เพิ่ม npm run test:docker เพื่อตรวจ health/create/retrieve ใน container ชั่วคราว
 - ตัวอย่าง API และรายการทดสอบร่วมทีมอยู่ใน [README.md](README.md)
-- ยังไม่ได้ยืนยัน API ร่วมทีม ทำ Integration Test เผยแพร่ image หรือ commit/push
+- ยังไม่ได้ยืนยัน API ร่วมทีม ทำ Integration Test หรือเผยแพร่ image; งาน Safe commit แล้ว และรวม origin/main ที่เครื่องมีถึง 104b7e9 เข้า safe แล้ว ยังไม่ได้ push

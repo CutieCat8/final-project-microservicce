@@ -72,7 +72,7 @@ npm run test:docker build image แล้วเปิด container ชั่ว�
 | HTTP tests เดิม | ยังยืนยันไม่ได้: sandbox ไม่อนุญาต listen (`EPERM`) ทั้ง 5 กรณี |
 | Docker script syntax | ผ่าน sh -n |
 | Docker build/runtime | ยังยืนยันไม่ได้: sandbox เข้า Docker socket ไม่ได้ |
-| Enrollment → Notification → เว็บ | ยังไม่ได้ทดสอบ ไม่มีโค้ด Enrollment/Gateway ใน checkout นี้ |
+| Enrollment → Notification → เว็บ | ยังไม่ได้ทดสอบ runtime; รวมโค้ดทีมจาก origin/main ที่มีในเครื่องแล้ว (104b7e9) |
 | Release ทั้ง 5 images | ยังไม่มีหลักฐาน Actions/Docker Hub ที่ตรวจยืนยัน |
 
 ## รายการส่งต่อทีม
@@ -85,3 +85,11 @@ npm run test:docker build image แล้วเปิด container ชั่ว�
 6. เมื่อทุก service พร้อม ตรวจ Secrets DOCKERHUB_USERNAME และ DOCKERHUB_TOKEN ของกลุ่ม รวมถึงผล release workflow ทั้ง 5 images พร้อม version tag
 
 Safe ดูแล .github/workflows/release-images.yml ซึ่งปัจจุบันทำงานเมื่อ push tag v* ต้องตรวจ run ที่ตรงกับ tag จริงก่อนติ๊กเผยแพร่สำเร็จ
+
+## หลังรวมโค้ดทีม
+
+รวม origin/main ที่เครื่องมีถึง 104b7e9 เข้า safe แล้ว โดยไม่มี conflict ตรวจ source พบว่า Enrollment ส่งทั้งสาม field ตรงกับ Notification และ Gateway มี route สำหรับเรียกข้อความ หน้าเว็บเรียก GET notification หลังลงทะเบียนแล้ว การตรวจนี้ยังไม่ใช่ผล Integration Test จริง
+
+Enrollment เก็บรายการไว้แม้ Notification ล้มเหลว และบันทึก error ใน log ส่วน GET notification อาจไม่พบข้อความ ต้องให้ทีมยืนยันพฤติกรรมหน้าเว็บกรณีนี้
+
+Build และ Unit Test Notification หลัง merge ผ่านแล้ว 2/2 การ fetch GitHub ครั้งนี้ล้มเหลวเพราะ resolve github.com ไม่ได้ จึงยังยืนยันไม่ได้ว่า origin/main ที่มีเป็นเวอร์ชันล่าสุดบน server
