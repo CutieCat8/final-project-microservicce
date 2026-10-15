@@ -64,3 +64,5 @@ Windsurf ดูแล docker-compose.yml และ deploy/docker-compose.release
 - ตั้ง Docker Hub namespace และ GitHub Actions Secrets ของ repo กลุ่มครั้งเดียว แล้วตรวจว่า Actions เผยแพร่ image ได้
 - รวมงานผ่าน Pull Request หลัง CI ผ่าน และเผยแพร่ tag เมื่อบริการครบและพร้อมเดโม
 - งาน service ของ Windsurf อยู่ใน services/gateway-web/; งาน PM ส่วนกลางทำเฉพาะไฟล์ร่วมที่ระบุข้างต้น
+
+<!-- trigger CI on fork -->

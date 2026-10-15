@@ -68,3 +68,5 @@ Windsurf ดูแล docker-compose.yml และ deploy/docker-compose.release
 
 
 
+
+<!-- trigger CI on fork -->
