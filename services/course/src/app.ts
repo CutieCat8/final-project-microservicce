@@ -1,14 +1,54 @@
-import express, { type ErrorRequestHandler } from 'express';
+import express, { type ErrorRequestHandler, type RequestHandler } from 'express';
+import { CourseService } from './course-service';
+import { CourseStore } from './course-store';
 import { HttpError } from './errors';
 
-export function createApp() {
+export function createApp(store = new CourseStore()) {
   const app = express();
+  const service = new CourseService(store);
 
   app.disable('x-powered-by');
   app.use(express.json({ limit: '16kb' }));
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', service: 'course' });
+  });
+
+  app.use('/api/courses', (_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
+
+  const requireJson: RequestHandler = (req, _res, next) => {
+    if (!req.is('application/json')) {
+      next(new HttpError(415, 'UNSUPPORTED_MEDIA_TYPE', 'Use Content-Type: application/json.'));
+      return;
+    }
+    next();
+  };
+
+  app.get('/api/courses', (req, res) => {
+    const term = typeof req.query.term === 'string' ? req.query.term : undefined;
+    const courses = service.list(term);
+    res.json({ courses });
+  });
+
+  app.get('/api/courses/:courseId', (req, res, next) => {
+    try {
+      const course = service.get(req.params.courseId);
+      res.json({ course });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post('/api/courses', requireJson, (req, res, next) => {
+    try {
+      const course = service.create(req.body);
+      res.status(201).json({ course });
+    } catch (err) {
+      next(err);
+    }
   });
 
   app.use((_req, res) => {
