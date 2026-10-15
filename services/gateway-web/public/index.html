@@ -79,12 +79,14 @@
     function formData(form) { return Object.fromEntries(new FormData(form).entries()); }
     document.querySelector('#register-form').addEventListener('submit', async event => {
       event.preventDefault();
-      try { show('สมัครบัญชีสำเร็จ', await callApi('/api/auth/register', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) })); }
+      try {
+        show('สมัครบัญชีสำเร็จ', await callApi('/api/auth/register', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) }));
       } catch (error) { message.textContent = error.message; }
     });
     document.querySelector('#login-form').addEventListener('submit', async event => {
       event.preventDefault();
-      try { show('เข้าสู่ระบบสำเร็จ', await callApi('/api/auth/login', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) })); }
+      try {
+        show('เข้าสู่ระบบสำเร็จ', await callApi('/api/auth/login', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) }));
       } catch (error) { message.textContent = error.message; }
     });
     document.querySelector('#load-courses').addEventListener('click', async () => {
