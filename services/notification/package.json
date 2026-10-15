@@ -7,7 +7,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "test": "jest --forceExit --detectOpenHandles"
+    "test": "jest --forceExit --detectOpenHandles",
+    "test:unit": "jest --runInBand --testPathPattern=\\.unit\\.test\\.ts$",
+    "test:docker": "sh scripts/test-docker.sh"
   },
   "dependencies": {
     "express": "^4.21.0"
