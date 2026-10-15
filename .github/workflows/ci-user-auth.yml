@@ -1,6 +1,7 @@
 name: CI - user-auth
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
     paths:
