@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 
+import { createConfirmation } from "./confirmation";
+
 const app = express();
 
 // ── Middleware ───────────────────────────────────────────────
@@ -38,11 +40,7 @@ app.post("/api/notifications", (req: Request, res: Response) => {
   }
 
   // สร้างข้อความยืนยันแบบจำลอง
-  const notification = {
-    enrollmentId,
-    message: `นักศึกษา ${studentId} ลงทะเบียนวิชา ${courseId} สำเร็จ (รหัสการลงทะเบียน: ${enrollmentId})`,
-    createdAt: new Date().toISOString(),
-  };
+  const notification = createConfirmation({ enrollmentId, studentId, courseId });
 
   // เก็บไว้ใน memory เพื่อให้ดึงดูได้ทีหลัง
   notifications.set(enrollmentId, notification);

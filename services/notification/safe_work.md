@@ -2,11 +2,12 @@
 
 **ตำแหน่ง:** นักพัฒนา (Developer)  
 **บริการที่รับผิดชอบ:** Notification Service  
-**ไฟล์แผนงานหลัก:** `../../work/member-work-file.md`
+**เอกสารอ้างอิงปัจจุบัน:** `../../README.md` และ [Notification README](README.md)
+**หมายเหตุ:** ไม่พบ `work/member-work-file.md` ใน checkout นี้
 
 ## วิธีใช้ไฟล์นี้
 
-ไฟล์นี้เป็นรายการงานเฉพาะของ Safe ส่วน `../../work/member-work-file.md` เป็นแผนงานหลักร่วมกันของกลุ่ม ใช้ไฟล์หลักเป็นแหล่งอ้างอิงเรื่องขอบเขตระบบ สัญญา API และการ Deploy เมื่อทำงานเสร็จและตรวจสอบแล้ว ให้อัปเดตเครื่องหมายในไฟล์นี้และรายการที่ตรงกันในไฟล์หลักให้ตรงกัน
+ไฟล์นี้เป็นรายการงานเฉพาะของ Safe ส่วนแผนงานหลัก `work/member-work-file.md` ยังไม่มีใน checkout นี้ ใช้ README ที่ root อ้างอิงขอบเขตชั่วคราว ใช้ไฟล์หลักเป็นแหล่งอ้างอิงเรื่องขอบเขตระบบ สัญญา API และการ Deploy เมื่อทำงานเสร็จและตรวจสอบแล้ว ให้อัปเดตเครื่องหมายในไฟล์นี้และรายการที่ตรงกันในไฟล์หลักให้ตรงกัน
 
 ทำเฉพาะงานที่ได้รับมอบหมายให้ Safe หากต้องเปลี่ยนขอบเขตหรือแก้ส่วนของบริการอื่น ให้คุยกับเจ้าของบริการก่อน ตรวจสถานะ Git และรักษาการแก้ไขเดิมไว้ ห้าม Commit หรือ Push งานของสมาชิกคนอื่น
 
@@ -15,9 +16,9 @@
 ความสำคัญ: **P0** จำเป็นต่อการส่งงานและเดโม; **P1** ทำต่อหลัง P0 หรือเมื่อมีเวลา
 
 - [ ] **P0:** ตกลงข้อมูลที่จำเป็นสำหรับข้อความยืนยันร่วมกับ Yuri และ Windsurf
-- [ ] **P0:** ทำ Endpoint สร้างข้อความยืนยันแบบจำลองหลังลงทะเบียนสำเร็จ
-- [ ] **P0:** ส่งข้อความตอบกลับที่ Gateway นำไปแสดงบนหน้าเว็บได้ โดยไม่ต้องเชื่อมอีเมลหรือ SMS
-- [ ] **P0:** เขียน Unit Test อย่างน้อย 1 รายการสำหรับข้อความยืนยัน
+- [x] **P0:** ทำ Endpoint สร้างข้อความยืนยันแบบจำลองหลังลงทะเบียนสำเร็จ
+- [x] **P0:** เตรียม JSON ข้อความตอบกลับสำหรับ Gateway โดยไม่เชื่อมอีเมลหรือ SMS (ยังรอทดสอบหน้าเว็บจริงกับทีม)
+- [x] **P0:** เขียน Unit Test สำหรับข้อความยืนยัน — ผ่าน 2/2 ด้วย npm run test:unit
 - [ ] **P0:** ทำ Integration Test ร่วมกับ Yuri สำหรับลำดับการลงทะเบียนและการยืนยัน
 - [ ] **P0:** ทำ Dockerfile และ build/test scripts ของ Notification; ดูแล release-images.yml และการเผยแพร่ image ทั้ง 5 ไป Docker Hub
 - [ ] **P1:** ตรวจการเรียก Notification Service จาก Enrollment และแก้ปัญหาร่วมกับผู้ทดสอบ
@@ -61,10 +62,19 @@ Windsurf ดูแล docker-compose.yml และ deploy/docker-compose.release
 - ตกลงข้อมูล Enrollment ID และข้อความตอบกลับกับ Yuri และ Windsurf
 - แจ้ง Windsurf เรื่องพอร์ต, health endpoint, environment variables, ชื่อ image registration-notification และคำสั่ง build/test
 - ทำ endpoint สร้างข้อความยืนยันภายในระบบและ unit test อย่างน้อย 1 รายการ ไม่ต้องเชื่อมอีเมลหรือ SMS
-- ไม่แก้ workflow กลางหรือไฟล์ deploy; ส่งข้อมูล build/test ให้ Sea และ Safe
+- ดูแล release-images.yml ตามขอบเขต Safe; ส่งข้อมูล build/test ให้ Sea และการเชื่อมต่อให้ Windsurf ไม่แก้ CI หรือ deploy ของผู้อื่น
 - ใช้ Docker Hub namespace ของกลุ่มที่ Windsurf กำหนด ไม่ต้องสร้าง token ส่วนตัวสำหรับ Actions
 
 
 
 
 
+
+## ผลตรวจ 16 ตุลาคม 2026
+
+- Build ผ่าน และ Unit Test ผ่าน 2/2
+- มี Dockerfile, build/test scripts และ release workflow แล้ว แต่ข้อเผยแพร่ยังไม่ติ๊ก เพราะยังไม่ยืนยัน Docker build/runtime และ image ทั้ง 5
+- HTTP tests 5 กรณีติด listen EPERM และ Docker ติดสิทธิ์ socket ของ sandbox ต้องตรวจต่อใน Terminal/CI ที่เข้าถึงได้
+- เพิ่ม npm run test:docker เพื่อตรวจ health/create/retrieve ใน container ชั่วคราว
+- ตัวอย่าง API และรายการทดสอบร่วมทีมอยู่ใน [README.md](README.md)
+- ยังไม่ได้ยืนยัน API ร่วมทีม ทำ Integration Test หรือเผยแพร่ image; งาน Safe commit แล้ว และรวม origin/main ที่เครื่องมีถึง 104b7e9 เข้า safe แล้ว ยังไม่ได้ push
