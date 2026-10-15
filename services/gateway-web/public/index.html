@@ -125,6 +125,10 @@
     .course p { margin: 0; color: var(--ink-soft); font-size: .88rem; }
     .done { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); background: var(--ok-soft); border: 1.5px solid var(--ink); border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: .85rem; white-space: nowrap; }
     @media (max-width: 560px) { .course { grid-template-columns: auto 1fr; } .course .act { grid-column: 1 / -1; } .course .act .btn { width: 100%; } }
+    .quick { display: grid; grid-template-columns: 1fr auto; gap: 8px 10px; align-items: end; margin-top: 18px; padding: 16px; border: 1.5px dashed var(--line); border-radius: var(--radius); }
+    .quick label { grid-column: 1 / -1; font-weight: 600; font-size: .9rem; }
+    .quick input { min-height: 44px; padding: 0 14px; font: inherit; color: var(--ink); background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; width: 100%; }
+    .quick input:focus { outline: none; border-color: var(--ink); }
     .skeleton { height: 86px; border-radius: var(--radius); background: linear-gradient(90deg, var(--paper-2), var(--card), var(--paper-2)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
     .side { display: grid; gap: 22px; }
     .box { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 18px; }
@@ -186,11 +190,11 @@
         </div>
         <div class="panel">
           <div class="tabs" role="tablist" aria-label="เข้าสู่ระบบหรือสมัครบัญชี">
-            <button type="button" role="tab" id="tab-login" aria-selected="true" aria-controls="form-login">เข้าสู่ระบบ</button>
-            <button type="button" role="tab" id="tab-register" aria-selected="false" aria-controls="form-register" tabindex="-1">สมัครบัญชี</button>
+            <button type="button" role="tab" id="tab-login" aria-selected="true" aria-controls="login-form">เข้าสู่ระบบ</button>
+            <button type="button" role="tab" id="tab-register" aria-selected="false" aria-controls="register-form" tabindex="-1">สมัครบัญชี</button>
           </div>
 
-          <form id="form-login" role="tabpanel" aria-labelledby="tab-login" novalidate>
+          <form id="login-form" role="tabpanel" aria-labelledby="tab-login" novalidate>
             <p class="alert" id="login-error" role="alert"></p>
             <div class="field"><label for="login-email">อีเมล</label><input id="login-email" name="email" type="email" autocomplete="email" required></div>
             <div class="field"><label for="login-password">รหัสผ่าน</label>
@@ -199,7 +203,7 @@
             <button class="btn accent block" type="submit"><span class="spin" aria-hidden="true"></span><span class="lbl">เข้าสู่ระบบ</span></button>
           </form>
 
-          <form id="form-register" role="tabpanel" aria-labelledby="tab-register" hidden novalidate>
+          <form id="register-form" role="tabpanel" aria-labelledby="tab-register" hidden novalidate>
             <p class="alert" id="register-error" role="alert"></p>
             <div class="field"><label for="reg-name">ชื่อ-นามสกุล</label><input id="reg-name" name="name" autocomplete="name" required></div>
             <div class="field"><label for="reg-email">อีเมล</label><input id="reg-email" name="email" type="email" autocomplete="email" required></div>
@@ -215,8 +219,14 @@
       <!-- ล็อกอินแล้ว -->
       <div class="app" id="app">
         <section aria-labelledby="courses-title">
-          <div class="sec-head"><h2 id="courses-title">รายวิชาที่เปิดสอน</h2><span id="courses-meta"></span></div>
+          <div class="sec-head"><h2 id="courses-title">รายวิชาที่เปิดสอน</h2><span id="courses-meta"></span><button class="btn ghost" id="load-courses" type="button">โหลดรายวิชาใหม่</button></div>
           <div class="courses" id="courses" aria-live="polite"></div>
+          <form class="quick" id="enroll-form" novalidate>
+            <label for="enroll-code">ลงทะเบียนด้วยรหัสวิชา</label>
+            <input id="enroll-code" name="courseId" list="course-codes" placeholder="เช่น CS103" autocomplete="off" required>
+            <datalist id="course-codes"></datalist>
+            <button class="btn" type="submit"><span class="spin" aria-hidden="true"></span><span class="lbl">ลงทะเบียน</span></button>
+          </form>
         </section>
         <div class="side">
           <section class="box" aria-labelledby="mine-title">
@@ -284,7 +294,7 @@
       const login = which === 'login';
       $('#tab-login').setAttribute('aria-selected', login); $('#tab-login').tabIndex = login ? 0 : -1;
       $('#tab-register').setAttribute('aria-selected', !login); $('#tab-register').tabIndex = login ? -1 : 0;
-      $('#form-login').hidden = !login; $('#form-register').hidden = login;
+      $('#login-form').hidden = !login; $('#register-form').hidden = login;
     }
     $('#tab-login').onclick = () => showTab('login');
     $('#tab-register').onclick = () => showTab('register');
@@ -318,8 +328,8 @@
         finally { busy(btn, false); }
       });
     }
-    authSubmit($('#form-login'), '#login-error', '/api/auth/login');
-    authSubmit($('#form-register'), '#register-error', '/api/auth/register');
+    authSubmit($('#login-form'), '#login-error', '/api/auth/login');
+    authSubmit($('#register-form'), '#register-error', '/api/auth/register');
 
     function signIn(user, isNew) {
       state.user = user;
@@ -370,6 +380,15 @@
       }
     }
 
+    $('#load-courses').onclick = loadAll;
+    $('#enroll-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const code = $('#enroll-code').value.trim().toUpperCase();
+      const course = state.courses.find(c => c.courseId.toUpperCase() === code);
+      if (!course) { toast('ไม่พบรายวิชา', code ? `ไม่มีรหัสวิชา ${code} ในรายการ` : 'กรุณากรอกรหัสวิชา', 'error'); return; }
+      enroll(course, $('button[type=submit]', e.currentTarget)).then(() => { $('#enroll-code').value = ''; });
+    });
+
     /* ---------- render ---------- */
     function render() {
       const on = !!state.user;
@@ -384,6 +403,7 @@
     function renderCourses() {
       const box = $('#courses');
       $('#courses-meta').textContent = `${state.courses.length} รายวิชา`;
+      $('#course-codes').replaceChildren(...state.courses.map(c => el('option', { value: c.courseId, label: c.name })));
       box.replaceChildren(...state.courses.map((c, i) => {
         const done = state.enrolled.has(c.courseId);
         const act = done
