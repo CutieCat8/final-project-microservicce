@@ -1,6 +1,7 @@
 name: CI - course
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
     paths:

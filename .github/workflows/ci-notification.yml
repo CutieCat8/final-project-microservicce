@@ -1,6 +1,7 @@
 name: CI - notification
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
     paths:

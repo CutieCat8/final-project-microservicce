@@ -5,64 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ระบบลงทะเบียนเรียนรายวิชา</title>
   <style>
-    :root { color-scheme: light; font-family: system-ui, sans-serif; background: #f4f7fb; color: #172033; }
-    body { margin: 0; }
-    header { padding: 2rem max(1rem, calc((100% - 960px) / 2)); background: #153b67; color: white; }
-    main { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem 2rem; display: grid; gap: 1rem; }
-    section { padding: 1.25rem; background: white; border: 1px solid #dbe3ee; border-radius: 12px; }
-    h1, h2 { margin-top: 0; }
-    form { display: flex; flex-wrap: wrap; gap: .65rem; }
-    input, button { font: inherit; padding: .65rem .8rem; border: 1px solid #bbc8d8; border-radius: 8px; }
-    input { flex: 1 1 180px; }
-    button { cursor: pointer; background: #1c5a99; color: white; border-color: #1c5a99; }
+    :root { color-scheme: light; font-family: "Segoe UI", Tahoma, sans-serif; background: #f3f6fb; color: #18263d; font-synthesis: none; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at 80% 0%, #e4efff 0, transparent 34rem), #f3f6fb; }
+    .topbar { background: #fff; border-bottom: 1px solid #e4eaf2; }
+    .topbar-inner { max-width: 1120px; margin: auto; padding: .9rem 1.25rem; display: flex; align-items: center; gap: .8rem; }
+    .brand-mark { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: #174a83; color: white; font-weight: 800; letter-spacing: -.04em; }
+    .brand-name { font-weight: 750; color: #17385f; }
+    .brand-caption { color: #718096; font-size: .82rem; margin-top: .1rem; }
+    .hero { max-width: 1120px; margin: auto; padding: 2.3rem 1.25rem 1.5rem; }
+    .eyebrow { margin: 0 0 .45rem; color: #2270aa; font-size: .8rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
+    h1 { margin: 0; color: #17385f; font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: -.035em; }
+    .hero-copy { margin: .65rem 0 0; max-width: 650px; color: #607086; line-height: 1.65; }
+    main { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem 2rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+    section.card { min-width: 0; padding: 1.35rem; background: #fff; border: 1px solid #e2e9f2; border-radius: 16px; box-shadow: 0 8px 24px #183b6410; }
+    .card-heading { margin-bottom: 1.1rem; }
+    h2 { margin: 0; color: #203955; font-size: 1.12rem; }
+    .card-description { margin: .3rem 0 0; color: #758399; font-size: .9rem; line-height: 1.5; }
+    .form-stack { display: grid; gap: .85rem; }
+    .field { display: grid; gap: .35rem; }
+    label { color: #4c5f76; font-size: .88rem; font-weight: 650; }
+    input { width: 100%; min-width: 0; padding: .75rem .85rem; border: 1px solid #cfd9e6; border-radius: 9px; background: #fff; color: #18263d; font: inherit; outline: none; transition: border-color .15s, box-shadow .15s; }
+    input:focus { border-color: #3884c5; box-shadow: 0 0 0 3px #3884c51c; }
+    input::placeholder { color: #9aa7b7; }
+    button { min-height: 43px; padding: .7rem 1rem; border: 1px solid #1c5a99; border-radius: 9px; background: #1c5a99; color: #fff; font: inherit; font-weight: 700; cursor: pointer; transition: background .15s, transform .15s; }
+    button:hover { background: #174a7d; }
+    button:active { transform: translateY(1px); }
     button.secondary { background: white; color: #1c5a99; }
-    li { margin: .5rem 0; }
-    output, pre { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
-    #message { min-height: 1.5rem; color: #153b67; }
+    button.secondary:hover { background: #f1f7fd; }
+    .form-divider { height: 1px; margin: 1.15rem 0; background: #e9eef5; }
+    .course-list { display: grid; gap: .55rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+    .course-list li { padding: .7rem .8rem; border: 1px solid #e7edf4; border-radius: 9px; color: #344c67; background: #fbfcfe; }
+    .empty-hint { margin: .9rem 0 0; color: #8794a5; font-size: .9rem; }
+    .response-card { grid-column: 1 / -1; }
+    #message { min-height: 1.4rem; color: #234e78; font-weight: 650; }
+    #result { max-height: 300px; overflow: auto; margin: .6rem 0 0; padding: 1rem; border-radius: 10px; background: #f5f8fc; color: #34465e; font: .82rem/1.6 Consolas, monospace; }
+    #auth-notice { position: fixed; z-index: 10; top: 1rem; right: 1rem; width: min(30rem, calc(100vw - 2rem)); display: flex; align-items: flex-start; gap: .8rem; padding: 1rem 1.1rem; border-radius: 12px; box-shadow: 0 12px 32px #1720332e; font-weight: 650; line-height: 1.5; animation: notice-in .18s ease-out; }
+    #auth-notice[hidden] { display: none; }
+    #auth-notice.success { background: #e8f7ee; border: 1px solid #86cf9f; color: #14532d; }
+    #auth-notice.error { background: #fff0f0; border: 1px solid #e6a0a0; color: #8b1e1e; }
+    #auth-notice-text { flex: 1; }
+    #auth-notice-close { min-height: auto; padding: 0 .2rem; border: 0; background: transparent; color: currentColor; font-size: 1.25rem; line-height: 1.2; }
+    #auth-notice-close:hover { background: transparent; opacity: .7; }
+    footer { padding: 0 1.25rem 1.5rem; text-align: center; color: #8794a5; font-size: .82rem; }
+    @keyframes notice-in { from { opacity: 0; transform: translateY(-7px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 700px) { main { grid-template-columns: 1fr; } .response-card { grid-column: auto; } .hero { padding-top: 1.7rem; } }
   </style>
 </head>
 <body>
-  <header>
-    <h1>ระบบลงทะเบียนเรียนรายวิชา</h1>
-    <p>ตัวอย่างหน้าเว็บสำหรับ Gateway ของโครงงานไมโครเซอร์วิส</p>
+  <div id="auth-notice" role="status" aria-live="polite" hidden>
+    <span id="auth-notice-text"></span>
+    <button id="auth-notice-close" type="button" aria-label="ปิดการแจ้งเตือน">×</button>
+  </div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-mark" aria-hidden="true">CR</div>
+      <div><div class="brand-name">Campus Registration</div><div class="brand-caption">ระบบบริการการศึกษา</div></div>
+    </div>
   </header>
+  <div class="hero">
+    <p class="eyebrow">ระบบบริการการศึกษา</p>
+    <h1>ระบบลงทะเบียนเรียนรายวิชา</h1>
+    <p class="hero-copy">สมัครสมาชิก เข้าสู่ระบบ เลือกรายวิชา และตรวจสอบผลการลงทะเบียนได้ในที่เดียว</p>
+  </div>
   <main>
-    <section>
-      <h2>บัญชีผู้ใช้</h2>
-      <form id="register-form">
-        <input name="name" placeholder="ชื่อ" required>
-        <input name="email" type="email" placeholder="อีเมล" required>
-        <input name="password" type="password" placeholder="รหัสผ่าน" required>
-        <button>สมัครบัญชี</button>
+    <section class="card">
+      <div class="card-heading"><h2>บัญชีผู้ใช้</h2><p class="card-description">สมัครบัญชีใหม่ หรือเข้าสู่ระบบเพื่อใช้งาน</p></div>
+      <form id="register-form" class="form-stack">
+        <div class="field"><label for="register-name">ชื่อ</label><input id="register-name" name="name" placeholder="ชื่อ-นามสกุล" autocomplete="name" required></div>
+        <div class="field"><label for="register-email">อีเมล</label><input id="register-email" name="email" type="email" placeholder="name@example.com" autocomplete="email" required></div>
+        <div class="field"><label for="register-password">รหัสผ่าน</label><input id="register-password" name="password" type="password" placeholder="อย่างน้อย 8 ตัวอักษร" autocomplete="new-password" required></div>
+        <button type="submit">สมัครบัญชี</button>
       </form>
-      <form id="login-form" style="margin-top:.75rem">
-        <input name="email" type="email" placeholder="อีเมล" required>
-        <input name="password" type="password" placeholder="รหัสผ่าน" required>
-        <button class="secondary">เข้าสู่ระบบ</button>
-      </form>
-    </section>
-    <section>
-      <h2>รายวิชา</h2>
-      <button id="load-courses" class="secondary">โหลดรายวิชา</button>
-      <ul id="courses"></ul>
-    </section>
-    <section>
-      <h2>ลงทะเบียนเรียน</h2>
-      <form id="enroll-form">
-        <input name="studentId" placeholder="รหัสนักศึกษา" required>
-        <input name="courseId" placeholder="รหัสวิชา" required>
-        <button>ลงทะเบียน</button>
+      <div class="form-divider"></div>
+      <form id="login-form" class="form-stack">
+        <div class="field"><label for="login-email">อีเมลสำหรับเข้าสู่ระบบ</label><input id="login-email" name="email" type="email" placeholder="name@example.com" autocomplete="email" required></div>
+        <div class="field"><label for="login-password">รหัสผ่าน</label><input id="login-password" name="password" type="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required></div>
+        <button class="secondary" type="submit">เข้าสู่ระบบ</button>
       </form>
     </section>
-    <section>
-      <h2>ผลการทำงาน</h2>
-      <output id="message" role="status" aria-live="polite"></output>
-      <pre id="result"></pre>
+    <section class="card">
+      <div class="card-heading"><h2>รายวิชา</h2><p class="card-description">ดูรายวิชาที่เปิดให้ลงทะเบียน</p></div>
+      <button id="load-courses" class="secondary" type="button">โหลดรายวิชา</button>
+      <ul id="courses" class="course-list"></ul>
+      <p id="courses-hint" class="empty-hint">กด “โหลดรายวิชา” เพื่อแสดงรายการ</p>
+    </section>
+    <section class="card">
+      <div class="card-heading"><h2>ลงทะเบียนเรียน</h2><p class="card-description">กรอกรหัสนักศึกษาและรหัสวิชาที่ต้องการลงทะเบียน</p></div>
+      <form id="enroll-form" class="form-stack">
+        <div class="field"><label for="student-id">รหัสนักศึกษา</label><input id="student-id" name="studentId" placeholder="เช่น 682110175" required></div>
+        <div class="field"><label for="course-id">รหัสวิชา</label><input id="course-id" name="courseId" placeholder="เช่น CS101" required></div>
+        <button type="submit">ลงทะเบียนเรียน</button>
+      </form>
+    </section>
+    <section class="card response-card">
+      <div class="card-heading"><h2>ผลการทำงาน</h2><p class="card-description">สถานะและรายละเอียดการตอบกลับจากระบบจะแสดงที่นี่</p></div>
+      <output id="message" role="status" aria-live="polite">รอการทำรายการ</output>
+      <pre id="result">ผลลัพธ์จากบริการจะแสดงหลังทำรายการ</pre>
     </section>
   </main>
+  <footer>ระบบลงทะเบียนเรียนรายวิชา · Campus Registration</footer>
   <script>
     const message = document.querySelector('#message');
     const result = document.querySelector('#result');
+    const authNotice = document.querySelector('#auth-notice');
+    const authNoticeText = document.querySelector('#auth-notice-text');
+    let authNoticeTimer;
+    function hideAuthNotice() {
+      clearTimeout(authNoticeTimer);
+      authNotice.hidden = true;
+    }
+    document.querySelector('#auth-notice-close').addEventListener('click', hideAuthNotice);
+    function notifyAuth(text, type) {
+      clearTimeout(authNoticeTimer);
+      authNoticeText.textContent = text;
+      authNotice.className = type;
+      authNotice.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      authNotice.hidden = false;
+      authNoticeTimer = setTimeout(hideAuthNotice, 2000);
+    }
+    function authErrorMessage(error) {
+      const message = error instanceof Error ? error.message : '';
+      if (message.includes('already registered')) return 'อีเมลนี้สมัครบัญชีไว้แล้ว กรุณาเข้าสู่ระบบหรือใช้อีเมลอื่น';
+      if (message.includes('Email or password is incorrect')) return 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+      if (message.includes('at least 8 characters')) return 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';
+      return message || 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง';
+    }
     async function callApi(url, options = {}) {
       const response = await fetch(url, {
         ...options,
@@ -79,13 +147,27 @@
     function formData(form) { return Object.fromEntries(new FormData(form).entries()); }
     document.querySelector('#register-form').addEventListener('submit', async event => {
       event.preventDefault();
-      try { show('สมัครบัญชีสำเร็จ', await callApi('/api/auth/register', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) })); }
-      } catch (error) { message.textContent = error.message; }
+      try {
+        const payload = await callApi('/api/auth/register', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) });
+        show('สมัครบัญชีสำเร็จ', payload);
+        notifyAuth('สมัครบัญชีสำเร็จแล้ว สามารถเข้าสู่ระบบได้เลย', 'success');
+      } catch (error) {
+        const text = authErrorMessage(error);
+        message.textContent = text;
+        notifyAuth('สมัครบัญชีไม่สำเร็จ: ' + text, 'error');
+      }
     });
     document.querySelector('#login-form').addEventListener('submit', async event => {
       event.preventDefault();
-      try { show('เข้าสู่ระบบสำเร็จ', await callApi('/api/auth/login', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) })); }
-      } catch (error) { message.textContent = error.message; }
+      try {
+        const payload = await callApi('/api/auth/login', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) });
+        show('เข้าสู่ระบบสำเร็จ', payload);
+        notifyAuth('เข้าสู่ระบบสำเร็จแล้ว', 'success');
+      } catch (error) {
+        const text = authErrorMessage(error);
+        message.textContent = text;
+        notifyAuth('เข้าสู่ระบบไม่สำเร็จ: ' + text, 'error');
+      }
     });
     document.querySelector('#load-courses').addEventListener('click', async () => {
       try {
@@ -97,6 +179,7 @@
           item.textContent = `${course.courseId || course.id || ''} — ${course.name || course.title || 'รายวิชา'}`;
           return item;
         }));
+        document.querySelector('#courses-hint').hidden = courses.length > 0;
         show(`โหลดรายวิชา ${courses.length} รายการ`, payload);
       } catch (error) { message.textContent = error.message; }
     });
@@ -104,14 +187,31 @@
       event.preventDefault();
       try {
         const payload = await callApi('/api/enrollments', { method: 'POST', body: JSON.stringify(formData(event.currentTarget)) });
-        show('ส่งคำขอลงทะเบียนแล้ว', payload);
-        const enrollmentId = payload.enrollment?.enrollmentId || payload.enrollmentId;
+        const enrollment = payload.enrollment?.enrollment || payload.enrollment || payload;
+        const enrollmentId = enrollment.enrollmentId || payload.enrollmentId;
         if (enrollmentId) {
-          const notification = await callApi(`/api/notifications/${encodeURIComponent(enrollmentId)}`);
-          show('ลงทะเบียนสำเร็จและได้รับข้อความยืนยัน', { enrollment: payload, notification });
+          const notificationPayload = await callApi(`/api/notifications/${encodeURIComponent(enrollmentId)}`);
+          const notification = notificationPayload.notification || notificationPayload;
+          show('ลงทะเบียนสำเร็จและได้รับข้อความยืนยัน', { enrollment: payload, notification: notificationPayload });
+          notifyAuth(notification.message || 'ลงทะเบียนสำเร็จและได้รับข้อความยืนยัน', 'success');
+        } else {
+          show('ส่งคำขอลงทะเบียนแล้ว', payload);
+          notifyAuth('ส่งคำขอลงทะเบียนแล้ว', 'success');
         }
-      } catch (error) { message.textContent = error.message; }
+      } catch (error) {
+        const text = error instanceof Error ? error.message : 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง';
+        message.textContent = text;
+        notifyAuth('ลงทะเบียนไม่สำเร็จ: ' + text, 'error');
+      }
     });
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
